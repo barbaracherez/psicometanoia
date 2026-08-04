@@ -892,14 +892,19 @@ function chk(text,done){
 }
 
 function miniCal(){
-  const rows=[[null,null,1,2,3,4,5],[6,7,8,9,10,11,12],[13,14,15,16,17,18,19],[20,21,22,23,24,25,26],[27,28,29,30,31,null,null]];
-  const evDays=[8,11,15,18,22];
+  const now=new Date(); const y=now.getFullYear(), mo=now.getMonth(), today=now.getDate();
+  const first=new Date(y,mo,1).getDay();
+  const ndays=new Date(y,mo+1,0).getDate();
+  const evDays={};
+  try{ if(typeof calItems==='function'){ calItems().forEach(function(x){ if(x&&x.m===mo && x.d) evDays[x.d]=1; }); } }catch(e){}
+  const cells=[]; for(let i=0;i<first;i++)cells.push(null); for(let d=1;d<=ndays;d++)cells.push(d); while(cells.length%7!==0)cells.push(null);
   const dows='DSTQQSS'.split('').map(d=>`<div style="font-size:9px;text-align:center;color:var(--muted);padding-bottom:4px">${d}</div>`).join('');
-  const days=rows.flat().map(d=>{
+  const days=cells.map(d=>{
     if(!d) return `<div class="cal-day other"></div>`;
-    return `<div class="cal-day${d===9?' today':''}${evDays.includes(d)?' has-ev':''}">${d}</div>`;
+    return `<div class="cal-day${d===today?' today':''}${evDays[d]?' has-ev':''}">${d}</div>`;
   }).join('');
-  return `<div style="margin-bottom:6px;font-family:var(--serif);font-size:14px;color:var(--white)">Julho 2026</div><div class="cal-grid">${dows}${days}</div>`;
+  const MN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  return `<div style="margin-bottom:6px;font-family:var(--serif);font-size:14px;color:var(--white)">${MN[mo]} ${y}</div><div class="cal-grid">${dows}${days}</div>`;
 }
 
 function riskColor(p,i){const s=p*i;return s>=15?'#D8B266':s>=8?'#D8B266':'#5FC98A';}
@@ -1129,6 +1134,8 @@ function loginAs(user){
   // Notificações: carrega estado lido/não-lido do usuário e mostra o contador
   if(typeof notifLoadRead==='function') notifLoadRead();
   if(typeof notifUpdateBadge==='function') notifUpdateBadge();
+  // Calendário sempre abre no mês/dia atual
+  try{ var _n=new Date(); calMonth=_n.getMonth(); calYear=_n.getFullYear(); }catch(e){}
   // Navigate to first allowed page
   const first = 'psicometanoia';
   setTimeout(collapseSidebarSections, 50);
@@ -1777,7 +1784,7 @@ function renderDashGeral(){
 // ── ÁREAS: CALENDÁRIO, DESLIGAMENTO, HELPDESK, RATEIO, CARTEIRINHA ─────────────
 var MABBR={JAN:0,FEV:1,MAR:2,ABR:3,MAI:4,JUN:5,JUL:6,AGO:7,SET:8,OUT:9,NOV:10,DEZ:11};
 var MNOME=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-var calMonth=5, calYear=2026;
+var _calNow=new Date(); var calMonth=_calNow.getMonth(), calYear=_calNow.getFullYear();
 function parseDue(due){ if(!due)return null; var s=String(due); var m=s.match(/(\d{1,2})\/(\d{1,2})/); if(m) return {d:+m[1], m:+m[2]-1}; var MT=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']; var mm=s.toLowerCase().match(/(\d{1,2})\s*(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/); if(mm) return {d:+mm[1], m:MT.indexOf(mm[2])}; return null; }
 function calItems(){ var out=[];
   (typeof EVENTS!=='undefined'?EVENTS:[]).forEach(function(e){ var mo=MABBR[(e.mon||'').toUpperCase()]; if(mo!=null) out.push({d:parseInt(e.day,10),m:mo,label:e.name,color:e.color||'#5DCAA5',tipo:'Evento',kind:'event',id:e.id}); });
