@@ -1033,14 +1033,7 @@ const ALL_MEMBERS = [
   {name:'Isabelly Moreira Brisida',first:'Isabelly',email:'isabellymoreiira@hotmail.com',role:'Col. Tesouraria',initials:'IB',cargo:'Analista de Entradas e Saídas II',color:'#5FC98A'},
   {name:'Victor Hugo Ferreira Lima',first:'Victor',email:'victorferreiraprof554@gmail.com',role:'Col. Secretaria',initials:'VL',color:'#9FE1CB'},
   {name:'Leticia Capuchinho Miguel',first:'Leticia',email:'lecapuchinho@hotmail.com',role:'Col. Secretaria',initials:'LM',color:'#9FE1CB'},
-  {name:'Gabriel Victor Silvério Santos',first:'Gabriel',email:'gabrielvictorsilveriosantos@gmail.com',role:'Col. Secretaria',initials:'GS',color:'#9FE1CB'},
-  {name:'Nicolas da Silva Sousa',first:'Nicolas',email:'',role:'Col. Secretaria',initials:'NC',color:'#9FE1CB',left:true,leftLabel:'Saída'},
-  {name:'Maria Fernanda Cester',first:'Maria',email:'',role:'Col. Secretaria',initials:'MC',color:'#9FE1CB',left:true,leftLabel:'Saída'},
-  {name:'Laura Ruotolo Silva Souza',first:'Laura',email:'',role:'Col. Tesouraria',initials:'LR',color:'#5FC98A',left:true,leftLabel:'Saída'},
-  {name:'Beatriz Quintino',first:'Beatriz',email:'',role:'Col. Comunicação',initials:'BQ',color:'#B4A2EE',left:true,leftLabel:'Saída'},
-  {name:'Caroline Ponce',first:'Caroline',email:'',role:'Col. Eventos',initials:'CP',color:'#D8B266',left:true,leftLabel:'Saída'},
-  {name:'Isabelle Vitoria Braga Vaz',first:'Isabelle',email:'',role:'Col. Eventos',initials:'IV',color:'#D8B266',left:true,leftLabel:'Saída'},
-  {name:'Monique Sales',first:'Monique',email:'',role:'Col. Eventos',initials:'MS',color:'#D8B266',left:true,leftLabel:'Saída'}];
+  {name:'Gabriel Victor Silvério Santos',first:'Gabriel',email:'gabrielvictorsilveriosantos@gmail.com',role:'Col. Secretaria',initials:'GS',color:'#9FE1CB'}];
 
 
 var REMOVED_EMAILS=['ajcfontanez@gmail.com'];
@@ -2510,7 +2503,7 @@ function renderEventDetail(id){
         <button class="btn btn-s btn-sm" style="width:100%;justify-content:center;font-size:11px;padding:7px;border-style:dashed;margin-top:8px" onclick="evAddChk(${ev.id})"><i class="ti ti-plus" style="font-size:11px"></i>Adicionar item</button>
       </div>
       <div class="card" style="margin-top:20px">
-        <div class="card-title" style="display:flex;align-items:center"><i class="ti ti-message-star" style="font-size:14px;margin-right:6px;color:var(--teal)"></i>Feedback do evento${full?`<span style="margin-left:auto"><button class="btn btn-s btn-sm" onclick="evSetFeedback(${ev.id})"><i class="ti ti-pencil" style="font-size:11px"></i>${ev.feedback?'Editar':'Registrar'}</button></span>`:''}</div>
+        <div class="card-title" style="display:flex;align-items:center"><i class="ti ti-message-star" style="font-size:14px;margin-right:6px;color:var(--teal)"></i>Feedback do evento${ev.feedbackNota?` <span class="badge" style="background:rgba(216,178,102,0.12);color:#D8B266;border:1px solid rgba(216,178,102,0.3)">Nota ${ev.feedbackNota}/5</span>`:''}${full?`<span style="margin-left:auto"><button class="btn btn-s btn-sm" onclick="evSetFeedback(${ev.id})"><i class="ti ti-pencil" style="font-size:11px"></i>${ev.feedback?'Editar':'Registrar'}</button></span>`:''}</div>
         ${ev.feedback?`<div style="font-size:12.5px;color:var(--gray);line-height:1.6;white-space:pre-wrap">${ev.feedback}</div>`:`<div style="font-size:11.5px;color:var(--muted)">Depois do evento, registre aqui o que acharam da empresa e como foi a tratativa dela com a comissão na festa. Fica visível para todos.</div>`}
       </div>
       <div class="card" style="margin-top:20px">
@@ -2544,7 +2537,37 @@ function renderEventDetail(id){
   </div>`;
 }
 
-function evSetFeedback(id){ if(!canEdit('Eventos')){toast('Apenas Eventos/Presidência registram o feedback.');return;} var ev=EVENTS.find(function(x){return x.id===id;}); if(!ev)return; uiPrompt('Feedback do evento — o que acharam da empresa e como foi a tratativa dela com a comissão na festa:',ev.feedback||'',function(v){ if(v===null)return; ev.feedback=(v||'').trim(); if(typeof sbPersist==='function')sbPersist(); toast('Feedback salvo.'); go('eventos'); }); }
+function evSetFeedback(id){ if(!canEdit('Eventos')){toast('Apenas Eventos/Presidência registram o feedback.');return;} var ev=EVENTS.find(function(x){return x.id===id;}); if(!ev)return;
+  var notaOpts='<option value=""'+(!ev.feedbackNota?' selected':'')+'>—</option>'+[5,4,3,2,1].map(function(n){return '<option value="'+n+'"'+((ev.feedbackNota||0)===n?' selected':'')+'>'+n+' / 5</option>';}).join('');
+  var o=uiOverlay('<div class="modal-hdr"><div class="modal-title">Feedback do evento</div></div>'
+    +'<div class="modal-body" style="max-height:70vh;overflow-y:auto">'
+    +'<div style="font-size:11.5px;color:var(--muted);margin-bottom:10px">O que acharam da empresa e como foi a tratativa dela com a comissão na festa. Pode escrever em parágrafos.</div>'
+    +'<div class="f-group" style="background:var(--surface);border:1px dashed var(--line-2);border-radius:10px;padding:12px">'
+      +'<label class="f-label" style="display:flex;align-items:center;gap:6px"><i class="ti ti-sparkles" style="color:var(--teal)"></i>Gerar com IA a partir de um texto</label>'
+      +'<div style="font-size:11px;color:var(--muted);margin-bottom:8px">Cole abaixo as anotações ou o texto original. A IA organiza em um feedback claro e sugere uma nota — você revisa.</div>'
+      +'<textarea id="evfb-src" class="f-textarea" style="width:100%;min-height:90px" placeholder="Cole aqui o texto original / anotações do evento..."></textarea>'
+      +'<button type="button" class="btn btn-s btn-sm" style="margin-top:6px" onclick="evFeedbackAI('+id+')"><i class="ti ti-sparkles" style="font-size:11px"></i> Gerar feedback e nota</button>'
+      +'<div id="evfb-ai-status" style="font-size:11px;color:var(--muted);margin-top:6px"></div>'
+    +'</div>'
+    +'<div class="f-group"><label class="f-label">Feedback (texto final)</label><textarea id="evfb-text" class="f-textarea" style="width:100%;min-height:260px;line-height:1.6;resize:vertical">'+fbEsc(ev.feedback||'')+'</textarea></div>'
+    +'<div class="f-group"><label class="f-label">Nota geral do evento</label><select id="evfb-nota" class="f-select" style="width:130px">'+notaOpts+'</select></div>'
+    +'</div>'
+    +'<div class="modal-footer"><button class="btn btn-s btn-sm" id="ui-cancel">Cancelar</button><button class="btn btn-p btn-sm" id="evfb-ok">Salvar</button></div>');
+  o.querySelector('#ui-cancel').onclick=uiCloseOv;
+  o.querySelector('#evfb-ok').onclick=function(){ var t=(o.querySelector('#evfb-text').value||'').trim(); var n=parseInt(o.querySelector('#evfb-nota').value,10); ev.feedback=t; ev.feedbackNota=(n>=1&&n<=5)?n:null; uiCloseOv(); if(typeof sbPersist==='function')sbPersist(); toast('Feedback salvo.'); go('eventos'); }; }
+async function evFeedbackAI(id){ var st=document.getElementById('evfb-ai-status');
+  if(!(typeof SB!=='undefined'&&SB&&SB_ON)){ if(st)st.textContent='Configure a IA (Supabase) para usar este recurso.'; return; }
+  var src=document.getElementById('evfb-src'); var txt=src?(src.value||'').trim():'';
+  if(!txt){ if(st){st.style.color='#D8B266';st.textContent='Cole o texto original primeiro.';} return; }
+  if(st){ st.style.color='var(--teal2)'; st.textContent='A IA está organizando o feedback...'; }
+  try{ var sys='Você organiza feedbacks de eventos de formatura escritos pela comissão sobre a empresa contratada e a tratativa dela com a comissão na festa. A partir do texto/anotações enviado, escreva um feedback claro e bem estruturado em português, com parágrafos e seções curtas quando fizer sentido (ex.: Pontos positivos, Pontos de melhoria, Considerações finais). Seja fiel ao conteúdo, sem inventar. Responda SOMENTE com JSON válido, sem markdown e sem texto extra, no formato exato: {"feedback":"","nota":0}. "feedback" = o texto final, usando \\n para quebras de parágrafo. "nota" = inteiro de 1 a 5 refletindo a avaliação geral (5 = excelente, 1 = péssima).';
+    var reply=await aiCall(sys,[{role:'user',content:txt}],1600);
+    var j=null; try{ var m=reply.match(/\{[\s\S]*\}/); j=JSON.parse(m?m[0]:reply); }catch(_){}
+    if(!j||!j.feedback){ if(st){st.style.color='#D8B266';st.textContent='Não consegui interpretar. Escreva manualmente.';} return; }
+    var ta=document.getElementById('evfb-text'); if(ta)ta.value=String(j.feedback).replace(/\\n/g,'\n');
+    if(j.nota){ var nv=Math.max(1,Math.min(5,parseInt(j.nota,10)||0)); var ns=document.getElementById('evfb-nota'); if(ns)ns.value=String(nv); }
+    if(st){ st.style.color='#5FC98A'; st.textContent='✓ Feedback e nota preenchidos pela IA. Revise antes de salvar.'; }
+  }catch(e){ if(st){st.style.color='#D8B266';st.textContent='IA indisponível: '+(e&&e.message||'erro');} } }
 function evAddFalta(id){ if(!canEdit('Eventos')){toast('Apenas Eventos/Presidência registram faltas.');return;} uiPrompt('Quem confirmou presença e não foi? (nome)','',function(nm){ if(nm===null||!nm.trim())return; uiPrompt('Motivo e se avisou alguém (ex.: teve imprevisto, avisou a Rep. de Eventos):','',function(mo){ if(mo===null)return; var ev=EVENTS.find(function(x){return x.id===id;}); if(!ev)return; ev.faltas=ev.faltas||[]; ev.faltas.push({nome:nm.trim(),motivo:(mo||'').trim()}); if(typeof sbPersist==='function')sbPersist(); go('eventos'); }); }); }
 function evDelFalta(id,ix){ var ev=EVENTS.find(function(x){return x.id===id;}); if(!ev||!ev.faltas)return; uiConfirm('Remover este registro?',function(){ ev.faltas.splice(ix,1); if(typeof sbPersist==='function')sbPersist(); go('eventos'); }); }
 // ── REUNIÕES ───────────────────────────────────────────────────────────────────
