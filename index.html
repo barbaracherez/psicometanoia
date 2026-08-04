@@ -314,6 +314,24 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
   background:rgba(93,202,165,0.07);
   box-shadow:0 0 0 3px rgba(93,202,165,0.07);
 }
+/* Mantém o campo escuro quando o navegador preenche automaticamente (autofill) */
+.login-input:-webkit-autofill,
+.login-input:-webkit-autofill:hover,
+.login-input:-webkit-autofill:focus,
+.login-input:-webkit-autofill:active{
+  -webkit-text-fill-color:#E1F5EE;
+  caret-color:#E1F5EE;
+  -webkit-box-shadow:0 0 0 1000px #0a1a1e inset;
+  box-shadow:0 0 0 1000px #0a1a1e inset;
+  border:1px solid rgba(93,202,165,0.09);
+  transition:background-color 99999s ease-in-out 0s;
+}
+.login-spin{
+  display:inline-block;width:13px;height:13px;vertical-align:-2px;margin-right:2px;
+  border:2px solid rgba(255,255,255,0.35);border-top-color:#fff;border-radius:50%;
+  animation:loginSpin 0.6s linear infinite;
+}
+@keyframes loginSpin{to{transform:rotate(360deg)}}
 .login-eye-btn{
   position:absolute;right:13px;top:50%;transform:translateY(-50%);
   background:none;border:none;cursor:pointer;
@@ -624,7 +642,7 @@ input[type=date],input[type=time],input[type=datetime-local]{color-scheme:dark}
       <label class="login-label" for="login-email">E-Mail</label>
       <div class="login-field-wrap">
         <svg class="login-fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <input class="login-input" type="email" id="login-email" placeholder="nome@clinica.com.br" autocomplete="email">
+        <input class="login-input" type="email" id="login-email" placeholder="email@psicometanoia.com" autocomplete="email">
       </div>
     </div>
 
@@ -1041,18 +1059,29 @@ function doLogin(){
   const email = document.getElementById('login-email').value.trim().toLowerCase();
   const pass  = document.getElementById('login-pass').value;
   const err   = document.getElementById('login-error');
-  function fail(msg){ err.style.display='flex'; err.innerHTML='<i class="ti ti-alert-circle" style="font-size:13px"></i>&nbsp;'+msg; }
+  const btn   = document.querySelector('.login-btn');
+  const btnHtml = btn ? btn.innerHTML : '';
+  function setLoading(on){
+    if(!btn) return;
+    if(on){ btn.disabled=true; btn.style.opacity='0.65'; btn.style.cursor='wait'; btn.innerHTML='<span class="login-spin"></span> Entrando...'; }
+    else { btn.disabled=false; btn.style.opacity=''; btn.style.cursor=''; btn.innerHTML=btnHtml; }
+  }
+  function fail(msg){ setLoading(false); err.style.display='flex'; err.innerHTML='<i class="ti ti-alert-circle" style="font-size:13px"></i>&nbsp;'+msg; }
   if(!email || !pass){ fail('Digite seu e-mail e senha.'); return; }
   if(typeof REMOVED_EMAILS!=='undefined' && REMOVED_EMAILS.indexOf(email)>=0){ fail('Este acesso foi removido. Fale com a Presidência.'); document.getElementById('login-pass').value=''; return; }
   if(SB_ON){
+    setLoading(true);
     SB.auth.signInWithPassword({email:email,password:pass}).then(function(res){
       if(res.error){ fail('E-mail ou senha incorretos.'); document.getElementById('login-pass').value=''; return; }
-      SB.from('members').select('*').eq('email',email).maybeSingle().then(function(m){
+      // Busca do membro e carga dos dados rodam em paralelo (mais rápido)
+      var pMember = SB.from('members').select('*').eq('email',email).maybeSingle();
+      var pData   = sbLoad();
+      pMember.then(function(m){
         if(!m.data){ SB.auth.signOut(); fail('Este e-mail não está cadastrado como membro da comissão.'); return; }
         var d=m.data; var user={email:email,name:d.name,first:d.first,initials:d.initials,role:d.role,access:d.access,color:d.color};
-        sbLoad().then(function(){ sbRealtime(); loginAs(user); });
+        pData.then(function(){ sbRealtime(); loginAs(user); });
       });
-    });
+    }).catch(function(){ fail('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.'); });
     return;
   }
   // modo demonstração (sem Supabase configurado)
