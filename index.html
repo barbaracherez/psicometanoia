@@ -515,6 +515,25 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
 
   /* Painéis flutuantes ocupam a largura da tela */
   #notif-panel,#settings-panel{left:8px!important;right:8px!important;width:auto!important;max-width:none!important}
+
+  /* Cards mais compactos e consistentes no celular */
+  #content .card{padding:13px}
+  #content .kpi,#content .stat-card{padding:13px 14px}
+  #content .page-title{font-size:19px;line-height:1.2}
+  #content .page-sub{font-size:12px}
+  #content .btn{padding:8px 12px;font-size:12px}
+  #content .btn-sm{padding:6px 10px}
+
+  /* Barras de ações (botões) quebram linha em vez de estourar */
+  #content [style*="display:flex"][style*="margin-bottom:14px"]{flex-wrap:wrap;gap:8px}
+  #content [style*="display:flex"][style*="margin-bottom:16px"]{flex-wrap:wrap}
+
+  /* Grupos de KPIs com respiro */
+  .g4,.g3,.g2{gap:8px}
+
+  /* Modais preenchem bem a tela */
+  .modal{max-width:calc(100vw - 20px)!important;max-height:88vh}
+  .modal-bg{padding:10px!important}
 }
 
 /* ============================================================
