@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>PsicoMetanoia — Plataforma de Governança</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -505,6 +508,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
   /* Grades de 2 colunas (1fr + coluna fixa) viram coluna única */
   #content [style*="grid-template-columns:1fr "]{grid-template-columns:1fr!important}
   .fb-grid,.proj-grid,.g-main{grid-template-columns:1fr!important;display:block!important}
+
+  /* Grades com muitas colunas fixas (mascote, brindes, valores) viram 2 colunas */
+  #content [style*="grid-template-columns:repeat(3,1fr)"],
+  #content [style*="grid-template-columns:repeat(4,1fr)"],
+  #content [style*="grid-template-columns:repeat(5,1fr)"],
+  #content [style*="grid-template-columns:repeat(6,1fr)"]{grid-template-columns:1fr 1fr!important}
+
+  /* Calendário: garante altura das células mesmo sem suporte a aspect-ratio */
+  .cal-day{aspect-ratio:auto!important;min-height:34px}
 
   /* Layout com barra lateral em flex empilha */
   #content [style*="align-items:flex-start"][style*="gap:14px"]{flex-direction:column}
@@ -1039,6 +1051,14 @@ function sbLoad(){ if(!SB_ON) return Promise.resolve(); return SB.from('app_stat
 function sbPersist(){ if(!SB_ON||_sbSuppress||!currentUser) return; clearTimeout(_sbTimer); _sbTimer=setTimeout(function(){ try{ var payload=sbSerialize(); var js=JSON.stringify(payload); if(js===_sbLastJSON) return; _sbLastJSON=js; SB.from('app_state').upsert({id:1,data:payload,updated_at:new Date().toISOString(),updated_by:(currentUser?(currentUser.email||currentUser.name):null)}).then(function(){}); }catch(e){} },700); }
 function sbRealtime(){ if(!SB_ON) return; try{ SB.channel('app_state_rt').on('postgres_changes',{event:'*',schema:'public',table:'app_state'},function(p){ if(!(p&&p.new&&p.new.data)) return; if(p.new.data.__client===SB_CLIENT) return; _sbSuppress=true; try{sbHydrate(p.new.data);}catch(e){} _sbSuppress=false; try{_sbLastJSON=JSON.stringify(sbSerialize());}catch(e){} try{notifPopNew();}catch(e){} if(!currentUser) return; var mb=document.getElementById('modal-bg'); var modalOpen=(mb&&mb.classList&&mb.classList.contains('open'))||!!selTask; if(!modalOpen) go(PAGE); }).subscribe(); }catch(e){} }
 sbInit();
+// Re-sincroniza os dados ao voltar para a aba (mantém tudo igual entre celular e computador)
+(function(){ if(typeof document==='undefined')return;
+  var _lastSync=0;
+  function _resync(){ if(document.hidden||!currentUser||!SB_ON||typeof sbLoad!=='function')return; var now=Date.now(); if(now-_lastSync<1500)return; _lastSync=now; sbLoad().then(function(){ var mb=document.getElementById('modal-bg'); var modalOpen=(mb&&mb.classList&&mb.classList.contains('open'))||(typeof selTask!=='undefined'&&selTask); if(!modalOpen && typeof PAGE!=='undefined' && typeof go==='function'){ try{go(PAGE);}catch(e){} } }); }
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden)_resync(); });
+  window.addEventListener('pageshow', function(){ _resync(); });
+  window.addEventListener('focus', function(){ _resync(); });
+})();
 
 
 const USERS = {
