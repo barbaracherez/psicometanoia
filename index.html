@@ -407,7 +407,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
 
 /* Mobile ≤767px — menu lateral (drawer) aberto pelo hambúrguer */
 @media(max-width:767px){
-  html,body{overflow-x:hidden}
+  html,body{height:auto!important;min-height:100%;overflow-x:hidden!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch}
   #app{display:block;height:auto;min-height:100vh}
 
   /* Menu lateral off-canvas (desliza da esquerda) */
@@ -438,9 +438,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
   /* Botão hambúrguer (só no mobile) */
   #btn-menu{display:flex!important}
 
-  /* Área principal ocupa a tela toda */
-  #main{width:100%;overflow:auto;height:auto;padding-bottom:20px}
-  #content{overflow-x:hidden;padding:12px}
+  /* Área principal ocupa a tela toda e rola junto com a página */
+  #main{width:100%;height:auto;overflow:visible;padding-bottom:24px}
+  #content{height:auto;overflow-x:hidden;overflow-y:visible;padding:12px;flex:none}
 
   /* Topbar */
   #topbar{padding:0 10px;gap:6px;height:48px}
@@ -487,9 +487,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
 
   /* Chat height */
   [style*="height:480px"]{height:320px!important}
-
-  /* Fornecedores 2-col */
-  .g3{grid-template-columns:1fr 1fr!important}
 }
 
 /* Small phones ≤400px */
@@ -524,9 +521,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
   #content .btn{padding:8px 12px;font-size:12px}
   #content .btn-sm{padding:6px 10px}
 
-  /* Barras de ações (botões) quebram linha em vez de estourar */
-  #content [style*="display:flex"][style*="margin-bottom:14px"]{flex-wrap:wrap;gap:8px}
-  #content [style*="display:flex"][style*="margin-bottom:16px"]{flex-wrap:wrap}
+  /* Linhas em flex quebram quando não cabem (evita cortar conteúdo lateralmente).
+     Só afeta layouts com estilo inline; .tabs e kanban (via classe) seguem rolando. */
+  #content [style*="display:flex"]{flex-wrap:wrap}
 
   /* Grupos de KPIs com respiro */
   .g4,.g3,.g2{gap:8px}
@@ -4370,15 +4367,32 @@ function toggleSettingsPanel() {
 }
 function updateProfilePhoto(input) {
   if (!input.files[0]) return;
+  var file=input.files[0];
   var r = new FileReader();
   r.onload = function(e) {
-    var av=document.getElementById('prof-av'); if(av){av.style.padding='0';av.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';}
-    if(currentUser){ currentUser.photo=e.target.result; if(currentUser.initials){ if(typeof MEMBER_PHOTOS==='undefined') MEMBER_PHOTOS={}; MEMBER_PHOTOS[currentUser.initials]=e.target.result; } }
-    var sbAv=document.querySelector('.user-card .av'); if(sbAv){ sbAv.style.padding='0'; sbAv.innerHTML='<img src="'+e.target.result+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">'; }
-    if(typeof sbPersist==='function') sbPersist();
-    if(typeof PAGE!=='undefined' && typeof go==='function'){ try{ go(PAGE); }catch(_e){} }
-    toast('Foto atualizada!');
-  }; r.readAsDataURL(input.files[0]);
+    // Comprime a foto (recorta quadrada, 256px, JPEG) para salvar leve — essencial no celular
+    var img=new Image();
+    img.onload=function(){
+      var out;
+      try{
+        var S=256; var cv=document.createElement('canvas'); cv.width=S; cv.height=S; var ctx=cv.getContext('2d');
+        var s=Math.min(img.width,img.height); var sx=(img.width-s)/2, sy=(img.height-s)/2;
+        ctx.drawImage(img, sx, sy, s, s, 0, 0, S, S);
+        out=cv.toDataURL('image/jpeg', 0.82);
+      }catch(_e){ out=e.target.result; }
+      applyProfilePhoto(out);
+    };
+    img.onerror=function(){ applyProfilePhoto(e.target.result); };
+    img.src=e.target.result;
+  }; r.readAsDataURL(file);
+}
+function applyProfilePhoto(dataUrl){
+  var av=document.getElementById('prof-av'); if(av){av.style.padding='0';av.style.overflow='hidden';av.innerHTML='<img src="'+dataUrl+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';}
+  if(currentUser){ currentUser.photo=dataUrl; if(currentUser.initials){ if(typeof MEMBER_PHOTOS==='undefined') MEMBER_PHOTOS={}; MEMBER_PHOTOS[currentUser.initials]=dataUrl; } }
+  if(typeof renderUserCard==='function') renderUserCard();
+  if(typeof sbPersist==='function') sbPersist();
+  if(typeof PAGE!=='undefined' && typeof go==='function'){ try{ go(PAGE); }catch(_e){} }
+  toast('Foto atualizada!');
 }
 function saveProfileInfo() {
   var el=document.getElementById('prof-nick'); var nick=el?el.value.trim():'';
