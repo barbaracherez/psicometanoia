@@ -43,7 +43,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);fo
 .nav-item i{font-size:15px;width:16px;text-align:center;flex-shrink:0}
 .nav-badge{margin-left:auto;background:rgba(216,178,102,0.15);border:1px solid rgba(216,178,102,0.25);color:var(--solar);font-size:9px;padding:1px 6px;border-radius:10px;font-weight:500}
 .sb-footer{margin-top:auto;padding:12px;border-top:1px solid var(--border);flex-shrink:0}
-.user-card{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:rgba(93,202,165,0.06);border:1px solid var(--border);transition:background .15s,border-color .15s}
+.user-card:hover{background:linear-gradient(135deg,rgba(93,202,165,0.12),rgba(180,162,238,0.08));border-color:rgba(93,202,165,0.25)}
 /* MAIN */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 #topbar{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;background:rgba(11,14,19,0.8);backdrop-filter:blur(20px);flex-shrink:0}
@@ -981,11 +982,11 @@ var SB_URL = 'https://bewsorwrktirggtjgltc.supabase.co'; // ex.: https://xxxxxxx
 var SB_KEY = 'sb_publishable_5sbAMU5p53r54SUcBO0X1g_KJR-RpS6'; // anon public key (começa com eyJ...)
 var SB=null, SB_ON=false, _sbTimer=null, _sbSuppress=false, _sbLastJSON=null, SB_CLIENT='c'+Math.random().toString(36).slice(2)+Date.now();
 function sbInit(){ try{ if(SB_URL && SB_KEY && window.supabase){ SB=window.supabase.createClient(SB_URL,SB_KEY); SB_ON=true; } }catch(e){} }
-function sbSerialize(){ return {TASKS:TASKS,FIN:FIN,FINTX:(typeof FINTX!=='undefined'?FINTX:[]),FINCENTROS:(typeof FINCENTROS!=='undefined'?FINCENTROS:[]),PRESTACOES:(typeof PRESTACOES!=='undefined'?PRESTACOES:[]),PROJECTS:PROJECTS,EVENTS:EVENTS,MEETINGS:MEETINGS,FEED:FEED,RISKS:RISKS,CONTRACTS:CONTRACTS,VOTACOES:VOTACOES,WIKI:WIKI,PESQUISAS:PESQUISAS,FORMS:FORMS,FORN:FORN,ATAS:ATAS,BRIEFING:BRIEFING,BIRTHDAYS:BIRTHDAYS,MEMBER_TEL:(typeof MEMBER_TEL!=='undefined'?MEMBER_TEL:{}),MEMBER_PHOTOS:(typeof MEMBER_PHOTOS!=='undefined'?MEMBER_PHOTOS:{}),GOV:(typeof GOV!=='undefined'?GOV:null),GOV_OKRS:(typeof GOV_OKRS!=='undefined'?GOV_OKRS:[]),FEEDBACKS:FEEDBACKS,CHAMADOS:CHAMADOS,RATEIOS:RATEIOS,DESLIGAMENTOS:DESLIGAMENTOS,REFERENCIAS:REFERENCIAS,NOTIFS:(typeof NOTIFS!=='undefined'?NOTIFS:[]),DASH_KPIS:(typeof DASH_KPIS!=='undefined'?DASH_KPIS:null),DASH_CARDS:(typeof DASH_CARDS!=='undefined'?DASH_CARDS:null),ARQ_META:(typeof ARQ_META!=='undefined'?ARQ_META:{}),ASSINATURAS:(typeof ASSINATURAS!=='undefined'?ASSINATURAS:[]),__client:SB_CLIENT}; }
+function sbSerialize(){ return {TASKS:TASKS,FIN:FIN,FINTX:(typeof FINTX!=='undefined'?FINTX:[]),FINCENTROS:(typeof FINCENTROS!=='undefined'?FINCENTROS:[]),PRESTACOES:(typeof PRESTACOES!=='undefined'?PRESTACOES:[]),PROJECTS:PROJECTS,EVENTS:EVENTS,MEETINGS:MEETINGS,FEED:FEED,RISKS:RISKS,CONTRACTS:CONTRACTS,VOTACOES:VOTACOES,WIKI:WIKI,PESQUISAS:PESQUISAS,FORMS:FORMS,FORN:FORN,ATAS:ATAS,BRIEFING:BRIEFING,BIRTHDAYS:BIRTHDAYS,MEMBER_TEL:(typeof MEMBER_TEL!=='undefined'?MEMBER_TEL:{}),MEMBER_PHOTOS:(typeof MEMBER_PHOTOS!=='undefined'?MEMBER_PHOTOS:{}),MEMBER_NICK:(typeof MEMBER_NICK!=='undefined'?MEMBER_NICK:{}),GOV:(typeof GOV!=='undefined'?GOV:null),GOV_OKRS:(typeof GOV_OKRS!=='undefined'?GOV_OKRS:[]),FEEDBACKS:FEEDBACKS,CHAMADOS:CHAMADOS,RATEIOS:RATEIOS,DESLIGAMENTOS:DESLIGAMENTOS,REFERENCIAS:REFERENCIAS,NOTIFS:(typeof NOTIFS!=='undefined'?NOTIFS:[]),DASH_KPIS:(typeof DASH_KPIS!=='undefined'?DASH_KPIS:null),DASH_CARDS:(typeof DASH_CARDS!=='undefined'?DASH_CARDS:null),ARQ_META:(typeof ARQ_META!=='undefined'?ARQ_META:{}),ASSINATURAS:(typeof ASSINATURAS!=='undefined'?ASSINATURAS:[]),__client:SB_CLIENT}; }
 function _hObj(t,s){ if(!t||!s||typeof s!=='object'||!Object.keys(s).length)return; Object.keys(t).forEach(function(k){delete t[k];}); Object.assign(t,s); }
 function _hArr(t,s){ if(!t||!Array.isArray(s)||!s.length)return; t.length=0; Array.prototype.push.apply(t,s); }
 function sbHydrate(s){ if(!s)return;
-  _hObj(TASKS,s.TASKS);_hObj(FIN,s.FIN);_hObj(BRIEFING,s.BRIEFING);_hObj(BIRTHDAYS,s.BIRTHDAYS);if(typeof MEMBER_TEL!=='undefined'&&s.MEMBER_TEL)_hObj(MEMBER_TEL,s.MEMBER_TEL);if(typeof MEMBER_PHOTOS!=='undefined'&&s.MEMBER_PHOTOS)_hObj(MEMBER_PHOTOS,s.MEMBER_PHOTOS); if(typeof GOV!=='undefined'&&s.GOV)_hObj(GOV,s.GOV); if(typeof GOV_OKRS!=='undefined')_hArr(GOV_OKRS,s.GOV_OKRS);
+  _hObj(TASKS,s.TASKS);_hObj(FIN,s.FIN);_hObj(BRIEFING,s.BRIEFING);_hObj(BIRTHDAYS,s.BIRTHDAYS);if(typeof MEMBER_TEL!=='undefined'&&s.MEMBER_TEL)_hObj(MEMBER_TEL,s.MEMBER_TEL);if(typeof MEMBER_PHOTOS!=='undefined'&&s.MEMBER_PHOTOS)_hObj(MEMBER_PHOTOS,s.MEMBER_PHOTOS);if(typeof MEMBER_NICK!=='undefined'&&s.MEMBER_NICK)_hObj(MEMBER_NICK,s.MEMBER_NICK); if(typeof GOV!=='undefined'&&s.GOV)_hObj(GOV,s.GOV); if(typeof GOV_OKRS!=='undefined')_hArr(GOV_OKRS,s.GOV_OKRS);
   _hArr(PROJECTS,s.PROJECTS);_hArr(EVENTS,s.EVENTS);_hArr(MEETINGS,s.MEETINGS);_hArr(FEED,s.FEED);_hArr(RISKS,s.RISKS);_hArr(CONTRACTS,s.CONTRACTS);_hArr(VOTACOES,s.VOTACOES);_hArr(WIKI,s.WIKI);_hArr(PESQUISAS,s.PESQUISAS);_hArr(FORMS,s.FORMS);_hArr(FORN,s.FORN);_hArr(ATAS,s.ATAS);
   if(Array.isArray(s.FINTX)&&s.FINTX.length && typeof FINTX!=='undefined')FINTX=s.FINTX; if(Array.isArray(s.FINCENTROS)&&s.FINCENTROS.length && typeof FINCENTROS!=='undefined')FINCENTROS=s.FINCENTROS; if(Array.isArray(s.PRESTACOES)&&s.PRESTACOES.length && typeof PRESTACOES!=='undefined')PRESTACOES=s.PRESTACOES;
   if(s.FEEDBACKS&&s.FEEDBACKS.length)FEEDBACKS=s.FEEDBACKS; if(s.CHAMADOS&&s.CHAMADOS.length)CHAMADOS=s.CHAMADOS; if(s.RATEIOS&&s.RATEIOS.length)RATEIOS=s.RATEIOS; if(s.DESLIGAMENTOS&&s.DESLIGAMENTOS.length&&s.DESLIGAMENTOS.some(function(x){return x&&x.historico;}))DESLIGAMENTOS=s.DESLIGAMENTOS; if(s.REFERENCIAS&&s.REFERENCIAS.length)REFERENCIAS=s.REFERENCIAS; if(s.NOTIFS&&s.NOTIFS.length && typeof NOTIFS!=='undefined')NOTIFS=s.NOTIFS; if(Array.isArray(s.DASH_KPIS)&&s.DASH_KPIS.length && typeof DASH_KPIS!=='undefined')DASH_KPIS=s.DASH_KPIS; if(Array.isArray(s.DASH_CARDS)&&s.DASH_CARDS.length && typeof DASH_CARDS!=='undefined')DASH_CARDS=s.DASH_CARDS; if(typeof ARQ_META!=='undefined'&&s.ARQ_META&&typeof s.ARQ_META==='object')_hObj(ARQ_META,s.ARQ_META); if(typeof ASSINATURAS!=='undefined'&&s.ASSINATURAS&&s.ASSINATURAS.length)ASSINATURAS=s.ASSINATURAS;
@@ -1098,6 +1099,8 @@ function quickLogin(id, name, role, color){
   loginAs({id,name,role,color});
 }
 
+function userGreetName(){ var u=currentUser||{}; return (u.initials&&typeof MEMBER_NICK!=='undefined'&&MEMBER_NICK[u.initials])||u.nick||u.first||(u.name?u.name.split(' ')[0]:'')||'membro'; }
+function renderUserCard(){ var el=document.querySelector('.user-card'); if(!el)return; var u=currentUser||{}; if(!u.initials && !u.name){ return; } var _uav = u.photo ? '<div class="av" style="width:34px;height:34px;padding:0;overflow:hidden"><img src="'+u.photo+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>' : '<div class="av" style="width:34px;height:34px;background:linear-gradient(135deg,#5DCAA5,#1D9E75);font-size:11px">'+(u.initials||(u.name?u.name.slice(0,2).toUpperCase():'?'))+'</div>'; el.innerHTML = _uav + '<div style="min-width:0"><div style="font-size:12.5px;font-weight:600;color:#5DCAA5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Olá, '+userGreetName()+'</div><div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(u.role||'')+'</div></div>'; }
 function loginAs(user){
   currentUser = user;
   if(user.initials && typeof MEMBER_PHOTOS!=='undefined' && MEMBER_PHOTOS[user.initials]) currentUser.photo=MEMBER_PHOTOS[user.initials];
@@ -1115,13 +1118,8 @@ function loginAs(user){
   var _bt=document.getElementById('nav-blacktag'); if(_bt) _bt.style.display=(user.access==='full')?'':'none';
 
   // Update user card
-  var _uav = currentUser.photo
-    ? `<div class="av" style="width:34px;height:34px;padding:0;overflow:hidden"><img src="${currentUser.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>`
-    : `<div class="av" style="width:34px;height:34px;background:linear-gradient(135deg,#5DCAA5,#1D9E75);font-size:11px">${user.initials||user.name.slice(0,2).toUpperCase()}</div>`;
-  document.querySelector('.user-card').innerHTML=`
-    ${_uav}
-    <div style="min-width:0"><div style="font-size:12px;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Olá, ${user.first||user.name.split(' ')[0]} 👋</div><div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${user.role}</div></div>
-  `;
+  if(user.initials && typeof MEMBER_NICK!=='undefined' && MEMBER_NICK[user.initials]) currentUser.nick=MEMBER_NICK[user.initials];
+  renderUserCard();
 
   // Smooth hide login
   const ls = document.getElementById('login-screen');
@@ -1569,6 +1567,7 @@ function renderDashColegiado(coleg){
 var currentModalType=null;
 var BIRTHDAYS={};
 var MEMBER_PHOTOS={}; // iniciais -> foto (dataURL), persistido no app_state e compartilhado
+var MEMBER_NICK={}; // iniciais -> apelido para a saudação, persistido no app_state
 var MEMBER_TEL={GD:'11 95435-0272',LB:'11 94344-4005',BC:'11 97334-6220',DC:'11 99960-4499',TA:'11 95409-2208',LC:'11 97041-4571',YC:'11 99743-4807',HR:'11 95656-4212',NS:'11 98460-7810',AS:'11 99302-2216',YM:'11 94472-9977',SC:'11 97344-7362',AR:'11 96860-9006',CA:'11 95134-8826',MM:'11 91336-4498',LT:'11 92142-0077',FA:'11 97281-8843',MY:'11 96118-5103',IA:'11 95237-3102',LL:'11 96830-5382',MF:'11 98574-3301',IB:'11 94934-8959',VL:'11 94890-7193',LM:'11 97442-3848',GS:'11 99709-6452'};
 var GOV={missao:'Organizar com excelência, transparência e união a formatura da turma PsicoMetanoia, criando memórias inesquecíveis e celebrando a transformação de estudantes em profissionais.',visao:'Ser referência em governança, planejamento e execução, deixando um legado de organização, transparência e memória institucional.'};
 var GOV_OKRS=[{obj:'Concluir a licitação e contratar a empresa',cor:'#5DCAA5',krs:[{k:'1ª fase — 6 empresas avaliadas',p:100},{k:'2ª fase — KAZ e TOY eliminadas',p:100},{k:'3ª fase (final) — RUB × Formô',p:60},{k:'Assinatura do contrato',p:0}]},{obj:'Estruturar a arrecadação (formatura 2029)',cor:'#5FC98A',krs:[{k:'Projeção financeira definida',p:100},{k:'Modelo de bolsistas/hipossuficientes',p:70},{k:'Lançamento e adesões (ago/set)',p:0}]},{obj:'Governança e integração',cor:'#9FE1CB',krs:[{k:'Estatuto aprovado',p:100},{k:'Atas arquivadas no Drive',p:90},{k:'Plataforma interna da comissão',p:70},{k:'Reuniões mensais de alinhamento',p:40}]}];
@@ -4292,9 +4291,10 @@ function toggleSettingsPanel() {
   var initStr = u.initials || u.name.slice(0,2).toUpperCase();
   var uPhoto = (u.photo)||(u.initials&&typeof MEMBER_PHOTOS!=='undefined'&&MEMBER_PHOTOS[u.initials])||'';
   var profAvInner = uPhoto ? '<img src="'+uPhoto+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">' : initStr;
+  var uNick=(u.initials&&typeof MEMBER_NICK!=='undefined'&&MEMBER_NICK[u.initials])||u.nick||u.first||'';
   el.innerHTML = '';
   var hdr = document.createElement('div'); hdr.style.cssText = 'padding:20px;border-bottom:1px solid var(--line)';
-  hdr.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><label style="cursor:pointer;position:relative;display:inline-block"><div id="prof-av" style="width:52px;height:52px;border-radius:50%;'+(uPhoto?'padding:0;overflow:hidden;':'background:linear-gradient(135deg,#5DCAA5,#1D9E75);')+'display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#040E18;border:2px solid rgba(93,202,165,0.3)">'+profAvInner+'</div><div style="position:absolute;bottom:0;right:0;width:18px;height:18px;background:var(--bg2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center"><i class="ti ti-camera" style="font-size:10px;color:var(--teal)"></i></div><input type="file" accept="image/*" style="display:none" onchange="updateProfilePhoto(this)"></label><div><div style="font-size:14px;font-weight:600;color:var(--white)">'+(u.name||u.first||'Usuário')+'</div><div style="font-size:11px;color:var(--muted)">'+u.role+'</div>'+(u.email?'<div style="font-size:10px;color:var(--teal);margin-top:2px">'+u.email+'</div>':'')+'</div></div><div style="display:flex;flex-direction:column;gap:8px"><div><label style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Nome</label><input class="f-input" id="prof-name" value="'+(u.name||u.first||'')+'" style="font-size:12px"></div><div><label style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Cargo</label><input class="f-input" id="prof-role" value="'+(u.role||'')+'" style="font-size:12px"></div><button class="btn btn-p" style="width:100%;justify-content:center;font-size:12px" onclick="saveProfileInfo()"><i class="ti ti-check" style="font-size:12px"></i>Salvar</button></div>';
+  hdr.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><label style="cursor:pointer;position:relative;display:inline-block"><div id="prof-av" style="width:52px;height:52px;border-radius:50%;'+(uPhoto?'padding:0;overflow:hidden;':'background:linear-gradient(135deg,#5DCAA5,#1D9E75);')+'display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#040E18;border:2px solid rgba(93,202,165,0.3)">'+profAvInner+'</div><div style="position:absolute;bottom:0;right:0;width:18px;height:18px;background:var(--bg2);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center"><i class="ti ti-camera" style="font-size:10px;color:var(--teal)"></i></div><input type="file" accept="image/*" style="display:none" onchange="updateProfilePhoto(this)"></label><div><div style="font-size:14px;font-weight:600;color:var(--white)">'+(u.name||u.first||'Usuário')+'</div><div style="font-size:11px;color:var(--muted)">'+u.role+'</div>'+(u.email?'<div style="font-size:10px;color:var(--teal);margin-top:2px">'+u.email+'</div>':'')+'</div></div><div style="display:flex;flex-direction:column;gap:8px"><div><label style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Apelido <span style="text-transform:none;letter-spacing:0;color:rgba(93,202,165,0.5)">(como quer ser chamada)</span></label><input class="f-input" id="prof-nick" value="'+uNick+'" placeholder="ex: Babi" style="font-size:12px" onkeydown="if(event.key===\'Enter\')saveProfileInfo()"></div><div><label style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Nome</label><input class="f-input" id="prof-name" value="'+(u.name||u.first||'')+'" style="font-size:12px"></div><div><label style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px">Cargo</label><input class="f-input" id="prof-role" value="'+(u.role||'')+'" style="font-size:12px"></div><button class="btn btn-p" style="width:100%;justify-content:center;font-size:12px" onclick="saveProfileInfo()"><i class="ti ti-check" style="font-size:12px"></i>Salvar</button></div>';
   el.appendChild(hdr);
   var links = document.createElement('div'); links.style.cssText = 'padding:8px 0';
   [['ti-file-certificate','Estatuto','secretaria'],['ti-shield','Governança','governanca'],['ti-chart-dots','Analytics','analytics'],['ti-book','Wiki','wiki']].forEach(function(item) {
@@ -4330,7 +4330,16 @@ function updateProfilePhoto(input) {
     toast('Foto atualizada!');
   }; r.readAsDataURL(input.files[0]);
 }
-function saveProfileInfo() { toast('Perfil atualizado!'); }
+function saveProfileInfo() {
+  var el=document.getElementById('prof-nick'); var nick=el?el.value.trim():'';
+  if(currentUser){
+    currentUser.nick = nick || currentUser.first || '';
+    if(currentUser.initials){ if(typeof MEMBER_NICK==='undefined') MEMBER_NICK={}; if(nick){ MEMBER_NICK[currentUser.initials]=nick; } else { delete MEMBER_NICK[currentUser.initials]; } }
+  }
+  if(typeof renderUserCard==='function') renderUserCard();
+  if(typeof sbPersist==='function') sbPersist();
+  toast('Perfil atualizado! Agora chamo você de '+userGreetName()+'.');
+}
 
 // ── VOTAÇÃO ACTIONS ───────────────────────────────────────────────────────────
 function castVoto(id, evt) {
