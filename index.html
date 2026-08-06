@@ -801,6 +801,14 @@ input[type=date],input[type=time],input[type=datetime-local]{color-scheme:dark}
   <div id="ai-fab-loader" style="display:none;padding:0 14px 8px;font-size:11px;color:var(--muted)"><i class="ti ti-loader-2"></i> pensando...</div>
   <div style="display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0"><input id="ai-fab-input" class="f-input" style="flex:1;font-size:12.5px" placeholder="Pergunte algo sobre esta aba..." onkeydown="if(event.key==='Enter')aiFabSend()"><button class="btn btn-p" onclick="aiFabSend()"><i class="ti ti-send"></i></button></div>
 </div>
+<script>
+/* Favicon: usa a logo da água-viva já embutida no site */
+(function(){ try{
+  var li=document.querySelector('.login-logo-icon img'); var fb=document.getElementById('ai-fab-img');
+  var src=(li&&li.src)||(fb&&fb.src);
+  if(src){ ['icon','shortcut icon','apple-touch-icon'].forEach(function(rel){ var link=document.createElement('link'); link.setAttribute('rel',rel); link.setAttribute('type','image/png'); link.setAttribute('href',src); document.head.appendChild(link); }); }
+}catch(e){} })();
+</script>
 <div class="modal-bg" id="modal-bg" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-hdr"><div class="modal-title" id="modal-title">Novo Item</div><button class="tb-btn btn" onclick="closeModal()" style="border:none"><i class="ti ti-x"></i></button></div>
