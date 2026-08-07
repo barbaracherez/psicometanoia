@@ -4277,14 +4277,14 @@ function handleModalFiles(input) {
 
 // ── NOTIFICATIONS ─────────────────────────────────────────────────────────────
 var NOTIFS = [
-  {icon:'ti-speakerphone',color:'#D8B266',text:'Comunicado obrigatório de Gabrielly (Presidência): reunião plenária na sexta',time:'há 2h'},
-  {icon:'ti-speakerphone',color:'#D8B266',text:'Comunicado de Barbara (Rep. Eventos): Fase 2 TOY/KAZ concluídas',time:'há 3h'},
-  {icon:'ti-building',color:'#B4A2EE',text:'Reunião RUB agendada para 15/06',time:'2h atrás'},
-  {icon:'ti-building',color:'#D8B266',text:'Reunião Formô agendada para 17/06',time:'2h atrás'},
-  {icon:'ti-building',color:'#5DCAA5',text:'Fase 2 KAZ concluída (20/05)',time:'3 sem atrás'},
-  {icon:'ti-building',color:'#5DCAA5',text:'Fase 2 TOY concluída (27/05)',time:'3 sem atrás'},
-  {icon:'ti-file-certificate',color:'#5FC98A',text:'Estatuto assinado por todos os 26 membros',time:'1 mês atrás'},
-  {icon:'ti-users',color:'#9FE1CB',text:'Relatório de hipossuficientes publicado',time:'3 sem atrás'},
+  {icon:'ti-speakerphone',color:'#D8B266',text:'Comunicado obrigatório de Gabrielly (Presidência): reunião plenária na sexta',time:'há 2h',link:'feed'},
+  {icon:'ti-speakerphone',color:'#D8B266',text:'Comunicado de Barbara (Rep. Eventos): Fase 2 TOY/KAZ concluídas',time:'há 3h',link:'feed'},
+  {icon:'ti-building',color:'#B4A2EE',text:'Reunião RUB agendada para 15/06',time:'2h atrás',link:'reunioes'},
+  {icon:'ti-building',color:'#D8B266',text:'Reunião Formô agendada para 17/06',time:'2h atrás',link:'reunioes'},
+  {icon:'ti-building',color:'#5DCAA5',text:'Fase 2 KAZ concluída (20/05)',time:'3 sem atrás',link:'fornecedores'},
+  {icon:'ti-building',color:'#5DCAA5',text:'Fase 2 TOY concluída (27/05)',time:'3 sem atrás',link:'fornecedores'},
+  {icon:'ti-file-certificate',color:'#5FC98A',text:'Estatuto assinado por todos os 26 membros',time:'1 mês atrás',link:'assinaturas'},
+  {icon:'ti-users',color:'#9FE1CB',text:'Relatório de hipossuficientes publicado',time:'3 sem atrás',link:'pesquisas'},
 ];
 var _notifSeen={};var _notifUnread=0;var _notifSound=false;try{_notifSound=(typeof localStorage!=='undefined'&&localStorage.getItem('psm_notif_sound')==='1');}catch(e){}
 // ── estado lido/não-lido (por usuário, persistido no navegador) ──
@@ -4297,7 +4297,14 @@ function notifMineList(){ return (typeof NOTIFS!=='undefined'?NOTIFS:[]).filter(
 function notifUnreadCount(){ return notifMineList().filter(function(n){ return !_notifRead[n.id]; }).length; }
 function notifMarkRead(id){ if(!id)return; _notifRead[id]=1; notifSaveRead(); notifUpdateBadge(); }
 function notifMarkAllRead(){ notifMineList().forEach(function(n){ _notifRead[n.id]=1; }); notifSaveRead(); notifUpdateBadge(); if(notifOpen){ notifOpen=false; toggleNotifPanel(); } }
-function notifClick(id){ var n=(typeof NOTIFS!=='undefined'?NOTIFS:[]).find(function(x){return x.id===id;}); notifMarkRead(id); var p=document.getElementById('notif-panel'); if(p)p.remove(); notifOpen=false; if(n&&n.link&&typeof go==='function')go(n.link); }
+function notifInferLink(n){
+  if(n&&n.link) return n.link;
+  var t=((n&&n.text)||'').toLowerCase();
+  var map=[['ata','secretaria'],['reuni','reunioes'],['evento','eventos'],['chamado','chamados'],['assin','assinaturas'],['estatuto','assinaturas'],['fornecedor','fornecedores'],['fase 2','fornecedores'],['contrat','fornecedores'],['projeto','projetos'],['demanda','demandas'],['responsável','demandas'],['responsavel','demandas'],['desligamento','desligamento'],['hipossufic','pesquisas'],['pesquisa','pesquisas'],['relatório','pesquisas'],['relatorio','pesquisas'],['briefing','psicometanoia'],['votaç','votacoes'],['votac','votacoes'],['comentou','feed'],['marcou você','feed'],['marcou voce','feed'],['comunicado','feed'],['publicaç','feed'],['post','feed'],['mural','feed']];
+  for(var i=0;i<map.length;i++){ if(t.indexOf(map[i][0])>=0) return map[i][1]; }
+  return 'feed';
+}
+function notifClick(id){ var n=(typeof NOTIFS!=='undefined'?NOTIFS:[]).find(function(x){return x.id===id;}); notifMarkRead(id); var p=document.getElementById('notif-panel'); if(p)p.remove(); notifOpen=false; var _lk=notifInferLink(n); if(_lk&&typeof go==='function')go(_lk); }
 function notifColegTargets(coleg){ if(!coleg||typeof ALL_MEMBERS==='undefined')return null; var c=String(coleg).toLowerCase(); var arr=ALL_MEMBERS.filter(function(m){ return (m.role||'').toLowerCase().indexOf(c)>=0; }).map(function(m){return m.initials;}); return arr.length?arr:null; }
 function notifUpdateBadge(){ var d=document.getElementById('notif-dot'); if(!d)return; var c=notifUnreadCount(); _notifUnread=c; if(c>0){ d.textContent=c>9?'9+':String(c); d.style.cssText='position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#5FC98A;color:#052018;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 2px var(--bg2)'; } else { d.textContent=''; d.style.cssText='position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;display:none'; } }
 function notifPlaySound(){ if(!_notifSound)return; try{ var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return; var ctx=new AC(); var o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.type='sine'; o.frequency.value=880; g.gain.setValueAtTime(0.0001,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.14,ctx.currentTime+0.01); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.3); o.start(); o.stop(ctx.currentTime+0.32); setTimeout(function(){try{ctx.close();}catch(e){}},450); }catch(e){} }
@@ -4750,7 +4757,7 @@ function briefingSave(section, modal) {
 
   modal.remove();
   toast('Briefing atualizado!');
-  addNotif({icon:'ti-edit',color:'#5DCAA5',text:(currentUser.first||currentUser.name)+' editou o briefing: '+section,time:'agora'});
+  addNotif({icon:'ti-edit',color:'#5DCAA5',text:(currentUser.first||currentUser.name)+' editou o briefing: '+section,time:'agora',link:'psicometanoia'});
   go('psicometanoia');
 }
 
