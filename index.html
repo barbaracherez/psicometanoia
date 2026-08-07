@@ -1058,13 +1058,15 @@ function sbHydrate(s){ if(!s)return;
 }
 function sbLoad(){ if(!SB_ON) return Promise.resolve(); return SB.from('app_state').select('data').eq('id',1).maybeSingle().then(function(r){ if(r&&r.data&&r.data.data&&Object.keys(r.data.data).length){ _sbSuppress=true; try{sbHydrate(r.data.data);}catch(e){} _sbSuppress=false; } try{_sbLastJSON=JSON.stringify(sbSerialize());}catch(e){} try{notifMarkAllSeen();}catch(e){} }).catch(function(){}); }
 function sbPersist(){ if(!SB_ON||_sbSuppress||!currentUser) return; clearTimeout(_sbTimer); _sbTimer=setTimeout(function(){ try{ var payload=sbSerialize(); var js=JSON.stringify(payload); if(js===_sbLastJSON) return; _sbLastJSON=js; SB.from('app_state').upsert({id:1,data:payload,updated_at:new Date().toISOString(),updated_by:(currentUser?(currentUser.email||currentUser.name):null)}).then(function(){}); }catch(e){} },700); }
+function sbFlush(){ if(!SB_ON||_sbSuppress||!currentUser) return; clearTimeout(_sbTimer); try{ var payload=sbSerialize(); var js=JSON.stringify(payload); if(js===_sbLastJSON) return; _sbLastJSON=js; SB.from('app_state').upsert({id:1,data:payload,updated_at:new Date().toISOString(),updated_by:(currentUser?(currentUser.email||currentUser.name):null)}).then(function(){}); }catch(e){} }
 function sbRealtime(){ if(!SB_ON) return; try{ SB.channel('app_state_rt').on('postgres_changes',{event:'*',schema:'public',table:'app_state'},function(p){ if(!(p&&p.new&&p.new.data)) return; if(p.new.data.__client===SB_CLIENT) return; _sbSuppress=true; try{sbHydrate(p.new.data);}catch(e){} _sbSuppress=false; try{_sbLastJSON=JSON.stringify(sbSerialize());}catch(e){} try{notifPopNew();}catch(e){} if(!currentUser) return; var mb=document.getElementById('modal-bg'); var modalOpen=(mb&&mb.classList&&mb.classList.contains('open'))||!!selTask; if(!modalOpen) go(PAGE); }).subscribe(); }catch(e){} }
 sbInit();
 // Re-sincroniza os dados ao voltar para a aba (mantém tudo igual entre celular e computador)
 (function(){ if(typeof document==='undefined')return;
   var _lastSync=0;
   function _resync(){ if(document.hidden||!currentUser||!SB_ON||typeof sbLoad!=='function')return; var now=Date.now(); if(now-_lastSync<1500)return; _lastSync=now; sbLoad().then(function(){ var mb=document.getElementById('modal-bg'); var modalOpen=(mb&&mb.classList&&mb.classList.contains('open'))||(typeof selTask!=='undefined'&&selTask); if(!modalOpen && typeof PAGE!=='undefined' && typeof go==='function'){ try{go(PAGE);}catch(e){} } }); }
-  document.addEventListener('visibilitychange', function(){ if(!document.hidden)_resync(); });
+  document.addEventListener('visibilitychange', function(){ if(document.hidden){ try{ if(typeof sbFlush==='function') sbFlush(); }catch(e){} return; } _resync(); });
+  window.addEventListener('pagehide', function(){ try{ if(typeof sbFlush==='function') sbFlush(); }catch(e){} });
   window.addEventListener('pageshow', function(){ _resync(); });
   window.addEventListener('focus', function(){ _resync(); });
 })();
@@ -1176,7 +1178,10 @@ function userGreetName(){ var u=currentUser||{}; return (u.initials&&typeof MEMB
 function renderUserCard(){ var el=document.querySelector('.user-card'); if(!el)return; var u=currentUser||{}; if(!u.initials && !u.name){ return; } var _uav = u.photo ? '<div class="av" style="width:34px;height:34px;padding:0;overflow:hidden"><img src="'+u.photo+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>' : '<div class="av" style="width:34px;height:34px;background:linear-gradient(135deg,#5DCAA5,#1D9E75);font-size:11px">'+(u.initials||(u.name?u.name.slice(0,2).toUpperCase():'?'))+'</div>'; el.innerHTML = _uav + '<div style="min-width:0"><div style="font-size:12.5px;font-weight:600;color:#5DCAA5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Olá, '+userGreetName()+'</div><div style="font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(u.role||'')+'</div></div>'; }
 function loginAs(user){
   currentUser = user;
-  if(user.initials && typeof MEMBER_PHOTOS!=='undefined' && MEMBER_PHOTOS[user.initials]) currentUser.photo=MEMBER_PHOTOS[user.initials];
+  if(user.initials && typeof MEMBER_PHOTOS!=='undefined'){
+    if(!MEMBER_PHOTOS[user.initials]){ try{ var _lp=localStorage.getItem('psm_photo_'+user.initials); if(_lp) MEMBER_PHOTOS[user.initials]=_lp; }catch(_e){} }
+    if(MEMBER_PHOTOS[user.initials]) currentUser.photo=MEMBER_PHOTOS[user.initials];
+  }
   const allowed = ACCESS_MAP[user.access] || ACCESS_MAP['full'];
   currentUser.allowed = allowed;
 
@@ -4429,7 +4434,7 @@ function updateProfilePhoto(input) {
 }
 function applyProfilePhoto(dataUrl){
   var av=document.getElementById('prof-av'); if(av){av.style.padding='0';av.style.overflow='hidden';av.innerHTML='<img src="'+dataUrl+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';}
-  if(currentUser){ currentUser.photo=dataUrl; if(currentUser.initials){ if(typeof MEMBER_PHOTOS==='undefined') MEMBER_PHOTOS={}; MEMBER_PHOTOS[currentUser.initials]=dataUrl; } }
+  if(currentUser){ currentUser.photo=dataUrl; if(currentUser.initials){ if(typeof MEMBER_PHOTOS==='undefined') MEMBER_PHOTOS={}; MEMBER_PHOTOS[currentUser.initials]=dataUrl; try{ localStorage.setItem('psm_photo_'+currentUser.initials, dataUrl); }catch(_e){} } }
   if(typeof renderUserCard==='function') renderUserCard();
   if(typeof sbPersist==='function') sbPersist();
   if(typeof PAGE!=='undefined' && typeof go==='function'){ try{ go(PAGE); }catch(_e){} }
